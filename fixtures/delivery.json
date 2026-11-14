@@ -1,0 +1,15 @@
+{
+  "deliveryId": "delivery-1",
+  "revision": "r1",
+  "roots": [
+    {
+      "href": "/files/structure.cif"
+    }
+  ],
+  "resources": [
+    {
+      "href": "/files/structure.cif",
+      "name": "structure.cif"
+    }
+  ]
+}

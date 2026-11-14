@@ -1,0 +1,11 @@
+{
+  "/files/structure.cif": {
+    "file": "structure.cif",
+    "mediaType": "application/octet-stream",
+    "partialFile": "structure.cif.partial"
+  },
+  "/deliveries": {
+    "file": "delivery.json",
+    "mediaType": "application/json"
+  }
+}

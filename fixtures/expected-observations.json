@@ -1,0 +1,39 @@
+[
+  {
+    "kind": "atom-observation",
+    "value": {
+      "block": "synthetic",
+      "id": "1",
+      "labelAsym": "A",
+      "authAsym": "X",
+      "model": 1,
+      "alt": "A"
+    }
+  },
+  {
+    "kind": "atom-observation",
+    "value": {
+      "block": "synthetic",
+      "id": "2",
+      "alt": "B"
+    }
+  },
+  {
+    "kind": "atom-observation",
+    "value": {
+      "block": "synthetic",
+      "id": "3",
+      "labelAsym": "B",
+      "insertionCode": "?"
+    }
+  },
+  {
+    "kind": "atom-observation",
+    "value": {
+      "block": "synthetic",
+      "id": "3",
+      "model": 2,
+      "alt": "."
+    }
+  }
+]
