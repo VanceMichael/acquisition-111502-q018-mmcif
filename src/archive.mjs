@@ -121,6 +121,23 @@ export class Archive {
     });
   }
 
+  async addIssue(collectionId, issue) {
+    identifier(collectionId);
+    if (!issue || typeof issue.reason !== 'string' || !issue.reason || typeof issue.location !== 'string' || !issue.location) {
+      throw Object.assign(new Error('invalid_issue'), { status: 400 });
+    }
+    return this.serialized(async () => {
+      const collection = await this.collection(collectionId);
+      const signature = JSON.stringify(issue);
+      if (collection.issues.some(existing => JSON.stringify(existing) === signature)) {
+        return issue;
+      }
+      collection.issues.push(issue);
+      await this.saveJson(join(this.directory, 'collections', collectionId + '.json'), collection);
+      return issue;
+    });
+  }
+
   async list() {
     return (await readdir(join(this.directory, 'collections'))).filter(name => name.endsWith('.json')).map(name => name.slice(0, -5));
   }

@@ -2,7 +2,7 @@
 
 人工资料接收保持兼容。POST /intakes 的 JSON 字段为 collectionId、sourceKey、revision、mediaType、contentBase64；返回 receiptId、sha256、byteLength 和轻量 summary。相同资料集、来源键与修订对应同一收件，字节不同返回 409。GET /receipts/{receiptId} 可读元数据，GET /receipts/{receiptId}/body 返回原字节。
 
-POST /acquisitions 接受 collectionId、entry 和可选 options，entry 是授权来源完整地址。当前只领取入口的原始内容并登记收件，返回 collectionId 和 receiptIds。自动解释沿用此入口，所有自动取得的依赖也应保留真实原文收件，不用人工造 records 代替自动接入。来源访问只限启动时冻结的 origin，不能访问其他主机或执行交付件。
+POST /acquisitions 接受 collectionId、entry 和可选 options，entry 是授权来源完整地址。入口若是交付索引（含 roots/resources 的 JSON），先领取入口原文，再领取同包 resources 与 roots，每个自动取得的依赖都登记真实原文收件，不用人工造 records 代替自动接入。roots 中的 mmCIF 入口按 docs/source-contract.md 自动解释为结构化 records，解释限制与缺件写入 issues；入口本身即 mmCIF 时直接解释。来源访问只限启动时冻结的 origin，不能访问其他主机或执行交付件。同 collectionId、来源键与修订重复领取保持幂等，不产生重复记录。
 
 GET /collections 返回资料集列表，GET /collections/{collectionId} 返回 collectionId、receiptIds、records、issues。结构化 records 的每项包含 kind、key、value、provenance；key 由各来源身份语义决定，不要求特定内部编码。provenance 是含 receiptId 与 location 的数组，location 可采用字节区间、原行列、JSON Pointer 等可复查定位。issues 每项包含 reason、location，至少能说明原因、受影响范围和已有来源依据，不能用静默丢弃表示未知。缺失资料不等于来源明确删除。
 
