@@ -121,6 +121,53 @@ export class Archive {
     });
   }
 
+  // 自动解释结果的整体提交：records 与 issues 都按内容幂等，
+  // 重复领取同一修订不会产生重复行，也不会覆盖已归档原文。
+  async commitInterpretation(collectionId, { records, issues }) {
+    identifier(collectionId);
+    for (const record of records || []) {
+      if (!record || typeof record.kind !== 'string' || typeof record.key !== 'string' || !record.value || typeof record.value !== 'object') {
+        throw Object.assign(new Error('invalid_record'), { status: 400 });
+      }
+      if (!Array.isArray(record.provenance) || record.provenance.length === 0) {
+        throw Object.assign(new Error('missing_provenance'), { status: 400 });
+      }
+      for (const origin of record.provenance) {
+        const receipt = await this.receipt(origin.receiptId);
+        if (receipt.collectionId !== collectionId || typeof origin.location !== 'string' || !origin.location) {
+          throw Object.assign(new Error('provenance_scope'), { status: 400 });
+        }
+      }
+    }
+    for (const issue of issues || []) {
+      if (!issue || typeof issue.reason !== 'string' || typeof issue.location !== 'string') {
+        throw Object.assign(new Error('invalid_issue'), { status: 400 });
+      }
+    }
+    return this.serialized(async () => {
+      const collection = await this.collection(collectionId);
+      let addedRecords = 0;
+      for (const record of records) {
+        const match = collection.records.find(existing => existing.kind === record.kind && existing.key === record.key);
+        if (match) {
+          if (JSON.stringify(match) !== JSON.stringify(record)) {
+            throw Object.assign(new Error('record_identity_conflict'), { status: 409 });
+          }
+        } else {
+          collection.records.push(record);
+          addedRecords += 1;
+        }
+      }
+      let addedIssues = 0;
+      for (const issue of issues) {
+        const duplicate = collection.issues.some(existing => JSON.stringify(existing) === JSON.stringify(issue));
+        if (!duplicate) { collection.issues.push(issue); addedIssues += 1; }
+      }
+      await this.saveJson(join(this.directory, 'collections', collectionId + '.json'), collection);
+      return { collectionId, records: collection.records, issues: collection.issues, addedRecords, addedIssues };
+    });
+  }
+
   async list() {
     return (await readdir(join(this.directory, 'collections'))).filter(name => name.endsWith('.json')).map(name => name.slice(0, -5));
   }

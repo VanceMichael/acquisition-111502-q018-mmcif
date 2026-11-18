@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node scripts/start.mjs",
     "build": "node scripts/check-syntax.mjs",
-    "test": "node --test test/base.test.mjs test/source.test.mjs",
+    "test": "node --test test/base.test.mjs test/source.test.mjs test/mmcif.test.mjs",
     "demo": "node scripts/demo.mjs",
     "acceptance:structured": "node test/structured-check.mjs",
     "acceptance:partial": "node test/partial-check.mjs"
